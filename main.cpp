@@ -5,16 +5,27 @@
 #include <iostream>
 #include <cctype> // isalnum
 
+
 #include "Encoder.h"
 
+#define EXIT_ARG 1 // error when parsing arguments
 
-void print(std::string str) {
+void reversePrint(std::string str) {
 	for (int i = str.length(); i >= 0; --i)
 		std::cout << str[i];
 }
 
-int main() {
+void printHelp() {
+	std::cerr << "Usage:" << std::endl;
+	std::cerr << " - encode:   ./bms -e <<< [ASCII string]" << std::endl;
+	std::cerr << " - decode:   ./bms -d <<< [string containing 0/1 characters]" << std::endl;
+}
 
+void decode() {
+
+}
+
+void encode() {
 	Encoder encoder;
 	std::string input;
 	std::string output;
@@ -28,14 +39,27 @@ int main() {
 	// Encode characters
 	for(unsigned long i = input.size(); i-- > 0; ) {
 		char c = input[i];
-		if (!isalnum(c))
-			continue;
-
-		output += encoder.step(8, c);
+		if (isalnum(c)) output += encoder.step(8, c);
 	}
+
+	// Flush shift register
 	output += encoder.step(5, 0);
 
-	print(output);
+	reversePrint(output);
+}
+
+int main(int argc, char* argv[]) {
+
+	if (argc == 2 && strcmp(argv[1], "-d") == 0) {
+		decode();
+	}
+	else if (argc == 2 && strcmp(argv[1], "-e") == 0) {
+		encode();
+	}
+	else {
+		printHelp();
+		exit(EXIT_ARG);
+	}
 
 	return EXIT_SUCCESS;
 }
