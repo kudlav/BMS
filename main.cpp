@@ -15,6 +15,7 @@
 void reversePrint(std::string str) {
 	for (int i = str.length(); i >= 0; --i)
 		std::cout << str[i];
+	std::cout << std::endl;
 }
 
 void printHelp() {

@@ -7,7 +7,7 @@
 
 #include <vector> // vector
 #include <limits> // numeric_limits
-#include <cctype> // isalnum
+#include <cctype> // isprint
 
 class Decoder {
 
@@ -68,7 +68,7 @@ public:
 		for (size_t i = 0; i < bestStates.size(); i++) {
 			std::string out = "";
 			if (traverse(bestStates[i], &out) || i == bestStates.size() - 1) {
-				std::cout << out;
+				std::cout << out << std::endl;
 				break;
 			}
 		}
@@ -105,7 +105,7 @@ private:
 				}
 				if (nBits == 8) {
 					*out += letter;
-					if (valid) valid = (isalnum(letter) != 0);
+					if (valid) valid = (isprint(letter) != 0);
 					nBits = 0;
 					letter = 0;
 				}
