@@ -4,11 +4,13 @@
 
 #include <iostream>
 #include <cctype> // isalnum
-
+#include <cstring> // strcmp
 
 #include "Encoder.h"
+#include "Decoder.h"
 
 #define EXIT_ARG 1 // error when parsing arguments
+
 
 void reversePrint(std::string str) {
 	for (int i = str.length(); i >= 0; --i)
@@ -21,20 +23,30 @@ void printHelp() {
 	std::cerr << " - decode:   ./bms -d <<< [string containing 0/1 characters]" << std::endl;
 }
 
-void decode() {
+void decode(std::string input) {
+	Decoder decoder;
+	unsigned char inputBits[2];
+	unsigned char inputIndex = 0;
+
+	for(unsigned long i = input.size(); i-- > 0; ) {
+		char c = input[i];
+
+		if (c == '0' || c == '1')
+			inputBits[inputIndex++] = c;
+
+		if (inputIndex == 2) {
+			decoder.step(inputBits);
+			inputIndex = 0;
+		}
+	}
+
+	decoder.result();
 
 }
 
-void encode() {
+void encode(std::string input) {
 	Encoder encoder;
-	std::string input;
 	std::string output;
-
-	// Read input
-	std::string line;
-	while(std::getline(std::cin, line)) {
-		input += line;
-	}
 
 	// Encode characters
 	for(unsigned long i = input.size(); i-- > 0; ) {
@@ -50,11 +62,19 @@ void encode() {
 
 int main(int argc, char* argv[]) {
 
+	std::string input;
+
+	// Read input
+	std::string line;
+	while(std::getline(std::cin, line)) {
+		input += line;
+	}
+
 	if (argc == 2 && strcmp(argv[1], "-d") == 0) {
-		decode();
+		decode(input);
 	}
 	else if (argc == 2 && strcmp(argv[1], "-e") == 0) {
-		encode();
+		encode(input);
 	}
 	else {
 		printHelp();

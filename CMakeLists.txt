@@ -3,4 +3,4 @@ project(ProjektBMS)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(ProjektBMS main.cpp Encoder.h)
+add_executable(ProjektBMS main.cpp Encoder.h Decoder.h)
