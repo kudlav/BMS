@@ -5,8 +5,7 @@
 #ifndef PROJEKTBMS_ENCODER_H
 #define PROJEKTBMS_ENCODER_H
 
-#include <sstream> // ostringstream
-
+#include <cctype> // isalnum
 
 class Encoder {
 
@@ -14,19 +13,19 @@ class Encoder {
 
 public:
 	std::string step(unsigned int nSteps, unsigned char input) {
-		std::ostringstream out;
+		std::string out;
 		for (unsigned int i = 0; i < nSteps; i++) {
 			// Set lowest input bit to highest bit in register
 			uint8_t inputLob = (input & 1);
 			memory |= (inputLob << 5);
 
-			std::cout << outputBits(memory);
+			out += outputBits(memory);
 
 			// Shift the register and input
 			memory >>= 1;
 			input >>= 1;
 		}
-		return out.str();
+		return out;
 	}
 
 	static std::string outputBits(uint8_t mem) {

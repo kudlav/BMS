@@ -7,6 +7,7 @@
 
 #include <vector> // vector
 #include <limits> // numeric_limits
+#include <cctype> // isalnum
 
 class Decoder {
 
@@ -52,35 +53,24 @@ public:
 
 	void result() {
 		// Find final lowest cost
-		unsigned char backtrackState = 0;
-		unsigned char lowestCost = costs[0];
+		std::vector<unsigned char> bestStates;
+		bestStates.push_back(0);
 		for (unsigned char i = 1; i < sizeof(costs)/sizeof(costs[0]); i++) {
-			if (costs[i] < lowestCost) {
-				backtrackState = i;
-				lowestCost = costs[i];
+			if (costs[i] < costs[bestStates[0]]) {
+				bestStates.clear();
+				bestStates.push_back(i);
+			}
+			else if (costs[i] == costs[bestStates[0]]) {
+				bestStates.push_back(i);
 			}
 		}
-
-		// Traverse final path (drop segment to n=0)
-		unsigned int dropChars = DROP_CHARS;
-		unsigned char letter = 0;
-		unsigned char nBits = 0;
-		for (size_t i = paths->size(); i-- > 0; ) {
-			if (dropChars == 0) {
-				nBits++;
-				letter <<= 1;
-				if ((backtrackState & 16) == 16) {
-					letter += 1; // highest n+1 bit means input of n step
-				}
-				if (nBits == 8) {
-					std::cout << letter;
-					nBits = 0;
-					letter = 0;
-				}
-			} else {
-				dropChars--;
+		// Find valid solution if there are more paths with same cost
+		for (size_t i = 0; i < bestStates.size(); i++) {
+			std::string out = "";
+			if (traverse(bestStates[i], &out) || i == bestStates.size() - 1) {
+				std::cout << out;
+				break;
 			}
-			backtrackState = paths[backtrackState][i];
 		}
 	}
 
@@ -98,6 +88,34 @@ private:
 		if (a[0] != b[0]) distance++;
 		if (a[1] != b[1]) distance++;
 		return distance;
+	}
+
+	/* Traverse final path (drop segment to n=0) */
+	bool traverse(unsigned char backtrackState, std::string* out) {
+		bool valid = true;
+		unsigned int dropChars = DROP_CHARS;
+		unsigned char letter = 0;
+		unsigned char nBits = 0;
+		for (size_t i = paths->size(); i-- > 0; ) {
+			if (dropChars == 0) {
+				nBits++;
+				letter <<= 1;
+				if ((backtrackState & 16) == 16) {
+					letter += 1; // highest n+1 bit means input of n step
+				}
+				if (nBits == 8) {
+					*out += letter;
+					if (valid) valid = (isalnum(letter) != 0);
+					nBits = 0;
+					letter = 0;
+				}
+			} else {
+				dropChars--;
+			}
+			backtrackState = paths[backtrackState][i];
+		}
+
+		return valid;
 	}
 
 };
